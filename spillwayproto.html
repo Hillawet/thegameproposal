@@ -1,0 +1,671 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spillway Car Wash & Grill</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+        
+        :root {
+            --primary-blue: #0ea5e9;
+            --accent-blue: #0284c8;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .logo-font {
+            font-family: 'Playfair Display', cursive;
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #0c4a6e 0%, #1e40af 100%);
+        }
+
+        .menu-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .menu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #0ea5e9;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+
+        .cart-slide {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        
+        .cart-slide.open {
+            transform: translateX(0);
+        }
+
+        .logo-container {
+            filter: drop-shadow(0 10px 15px rgba(14, 165, 233, 0.3));
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white">
+    <!-- SCAN SCREEN -->
+    <div id="scan-screen" class="min-h-screen hero-bg flex flex-col items-center justify-center p-6">
+        <div class="max-w-md w-full text-center">
+            <!-- Logo -->
+            <div class="logo-container mb-12">
+                <img id="logo-main" src="/home/workdir/attachments/image.png" 
+                     alt="Spillway Logo" 
+                     class="mx-auto w-72 h-auto">
+            </div>
+            
+            <h1 class="text-5xl font-bold logo-font tracking-tight mb-2 text-white">Spillway</h1>
+            <p class="text-sky-300 text-xl mb-10">Car Wash &amp; Grill • Ibex Hill, Lusaka</p>
+            
+            <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-10 mb-12 border border-white/20">
+                <div class="w-32 h-32 mx-auto mb-6 bg-white/10 rounded-2xl flex items-center justify-center border-2 border-dashed border-sky-400">
+                    <i class="fa-solid fa-qrcode text-7xl text-sky-400"></i>
+                </div>
+                <h2 class="text-3xl font-semibold mb-3">Welcome to the Grill</h2>
+                <p class="text-sky-200 mb-8">Scan the QR code at your table to view our menu and order instantly</p>
+                
+                <button onclick="startScanning()" 
+                        class="w-full bg-white text-zinc-900 hover:bg-sky-200 transition-colors font-semibold text-xl py-5 rounded-2xl flex items-center justify-center gap-3 shadow-xl">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>SCAN QR CODE</span>
+                </button>
+                
+                <button onclick="skipScan()" 
+                        class="mt-6 text-sky-300 hover:text-white text-sm flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>Continue without scanning (demo)</span>
+                </button>
+            </div>
+            
+            <div class="flex justify-center gap-8 text-sm text-sky-300/70">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>Ibex Hill Main Street 12/27</span>
+                </div>
+                <a href="tel:+260770590657" class="flex items-center gap-2 hover:text-sky-200">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>+260 770 590657</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="hidden min-h-screen bg-zinc-950">
+        <!-- HEADER -->
+        <header class="sticky top-0 bg-zinc-900 border-b border-white/10 z-50">
+            <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <img src="/home/workdir/attachments/image.png" alt="Spillway" class="h-12">
+                    <div>
+                        <h1 class="text-2xl font-bold logo-font tracking-tighter">Spillway</h1>
+                        <p class="text-xs text-sky-400 -mt-1">CAR WASH &amp; GRILL</p>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8 text-sm">
+                    <a href="#" onclick="navigateTo('menu')" class="nav-link text-white hover:text-sky-400">MENU</a>
+                    <a href="#" onclick="navigateTo('drinks')" class="nav-link text-white hover:text-sky-400">DRINKS</a>
+                    <a href="#" onclick="navigateTo('specials')" class="nav-link text-white hover:text-sky-400">SPECIALS</a>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div onclick="toggleCart()" 
+                         class="relative cursor-pointer">
+                        <i class="fa-solid fa-cart-shopping text-2xl"></i>
+                        <span id="cart-count" 
+                              class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-mono w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </div>
+                    <div class="bg-white/10 text-xs px-4 py-2 rounded-2xl flex items-center gap-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        Table <span id="table-number" class="font-mono">07</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- WELCOME BANNER -->
+        <div class="bg-gradient-to-r from-sky-700 to-blue-800 py-8">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="flex-1">
+                        <p class="uppercase tracking-widest text-sky-200 text-sm">Ibex Hill • Lusaka, Zambia</p>
+                        <h2 class="text-4xl font-bold logo-font">Welcome to Spillway Grill!</h2>
+                        <p class="text-sky-100 mt-2 max-w-md">Fresh grilled specialties, cold drinks, and friendly service. Order now and enjoy.</p>
+                    </div>
+                    <div class="flex gap-4 text-sm">
+                        <div class="bg-white/10 backdrop-blur px-6 py-4 rounded-3xl text-center">
+                            <div class="text-3xl font-mono font-bold text-emerald-400">12</div>
+                            <div class="text-xs uppercase tracking-widest">Tables</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur px-6 py-4 rounded-3xl text-center">
+                            <div class="text-3xl font-mono font-bold text-amber-400">7</div>
+                            <div class="text-xs uppercase tracking-widest">Chefs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU SECTION -->
+        <div id="menu-section" class="max-w-6xl mx-auto px-6 py-12">
+            <div class="flex items-end justify-between mb-8">
+                <div>
+                    <span class="uppercase text-sky-400 text-sm tracking-widest font-medium">Our Menu</span>
+                    <h2 class="text-4xl font-semibold logo-font">Signature Dishes</h2>
+                </div>
+                <div class="text-right">
+                    <input id="search-input" 
+                           onkeyup="filterMenu()"
+                           type="text" 
+                           placeholder="Search menu..." 
+                           class="bg-zinc-900 border border-white/20 focus:border-sky-400 rounded-2xl px-6 py-3 w-72 outline-none text-sm">
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="flex gap-3 overflow-x-auto pb-6 scrollbar-hide">
+                <button onclick="filterCategory(this)" data-category="all" 
+                        class="category-btn active px-8 py-3 bg-white text-zinc-900 rounded-3xl font-medium whitespace-nowrap">All</button>
+                <button onclick="filterCategory(this)" data-category="grill" 
+                        class="category-btn px-8 py-3 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-3xl font-medium whitespace-nowrap">Grill</button>
+                <button onclick="filterCategory(this)" data-category="sides" 
+                        class="category-btn px-8 py-3 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-3xl font-medium whitespace-nowrap">Sides</button>
+                <button onclick="filterCategory(this)" data-category="drinks" 
+                        class="category-btn px-8 py-3 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-3xl font-medium whitespace-nowrap">Drinks</button>
+            </div>
+
+            <!-- Menu Grid -->
+            <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="bg-zinc-900 py-12 border-t border-white/10">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div>
+                        <img src="/home/workdir/attachments/image.png" alt="Spillway" class="h-10 mb-4">
+                        <p class="text-sm text-zinc-400">Premium car wash and authentic Zambian grill experience.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium mb-4">Visit Us</h4>
+                        <p class="text-sm text-zinc-400 leading-relaxed">
+                            Ibex Hill<br>
+                            Main Street 12/27<br>
+                            Lusaka, Zambia
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium mb-4">Contact</h4>
+                        <a href="tel:+260770590657" class="block text-sky-400 hover:text-white mb-1">+260 770 590657</a>
+                        <p class="text-xs text-zinc-500">Open daily 8:00 AM - 10:00 PM</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium mb-4">Follow Us</h4>
+                        <div class="flex gap-4 text-2xl">
+                            <i class="fa-brands fa-facebook text-sky-400 hover:text-white cursor-pointer"></i>
+                            <i class="fa-brands fa-instagram text-sky-400 hover:text-white cursor-pointer"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center text-xs text-zinc-500 mt-12">
+                    © 2026 Spillway Car Wash &amp; Grill. All rights reserved.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div id="cart-drawer" class="cart-slide fixed top-0 right-0 h-full w-full max-w-md bg-zinc-900 shadow-2xl z-[100] flex flex-col">
+        <div class="p-6 border-b border-white/10 flex items-center justify-between">
+            <h3 class="text-2xl font-semibold">Your Order</h3>
+            <button onclick="toggleCart()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
+        </div>
+        
+        <div id="cart-items" class="flex-1 overflow-auto p-6 space-y-6">
+            <!-- JS populated -->
+        </div>
+        
+        <div class="p-6 border-t border-white/10">
+            <div class="flex justify-between text-lg mb-6">
+                <span class="text-zinc-400">Total</span>
+                <span id="cart-total" class="font-semibold text-3xl">K0.00</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="payAtTill()" 
+                        class="py-6 bg-white text-zinc-900 rounded-3xl font-semibold text-lg active:scale-95 transition">
+                    PAY AT TILL
+                </button>
+                <button onclick="payWithCard()" 
+                        class="py-6 bg-sky-600 hover:bg-sky-500 rounded-3xl font-semibold text-lg active:scale-95 transition">
+                    PAY WITH CARD
+                </button>
+            </div>
+            
+            <button onclick="toggleCart()" 
+                    class="mt-4 w-full text-zinc-400 py-4">Continue Browsing</button>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="payment-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-[200] flex items-center justify-center">
+        <div class="bg-zinc-900 rounded-3xl max-w-md w-full mx-4 overflow-hidden">
+            <div class="p-8">
+                <h3 class="text-2xl font-bold mb-2" id="modal-title">Payment</h3>
+                <p id="modal-subtitle" class="text-zinc-400">Processing your order...</p>
+            </div>
+            
+            <div id="payment-content" class="px-8 pb-8">
+                <!-- Dynamic content -->
+            </div>
+            
+            <div class="p-4 border-t border-white/10">
+                <button onclick="closePaymentModal()" 
+                        class="w-full py-6 text-zinc-400 font-medium">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu data
+        let menuItems = [
+            {
+                id: 1,
+                name: "Grilled T-Bone Steak",
+                category: "grill",
+                price: 185,
+                desc: "300g Zambian beef, grilled to perfection with chimichurri",
+                img: "https://picsum.photos/id/201/400/300"
+            },
+            {
+                id: 2,
+                name: "Peri Peri Chicken",
+                category: "grill",
+                price: 95,
+                desc: "Half chicken marinated in spicy peri peri sauce",
+                img: "https://picsum.photos/id/1060/400/300"
+            },
+            {
+                id: 3,
+                name: "Grilled Tilapia",
+                category: "grill",
+                price: 125,
+                desc: "Fresh lake fish with lemon garlic butter",
+                img: "https://picsum.photos/id/292/400/300"
+            },
+            {
+                id: 4,
+                name: "Chips & Gravy",
+                category: "sides",
+                price: 45,
+                desc: "Crispy potato chips with rich beef gravy",
+                img: "https://picsum.photos/id/20/400/300"
+            },
+            {
+                id: 5,
+                name: "Nshima & Relish",
+                category: "sides",
+                price: 55,
+                desc: "Traditional maize meal with choice of relish",
+                img: "https://picsum.photos/id/431/400/300"
+            },
+            {
+                id: 6,
+                name: "Spillway Burger",
+                category: "grill",
+                price: 85,
+                desc: "Beef patty, cheese, bacon & special sauce",
+                img: "https://picsum.photos/id/431/400/300"
+            },
+            {
+                id: 7,
+                name: "Mango Lassi",
+                category: "drinks",
+                price: 35,
+                desc: "Refreshing yogurt mango drink",
+                img: "https://picsum.photos/id/106/400/300"
+            },
+            {
+                id: 8,
+                name: "Zambezi Lager",
+                category: "drinks",
+                price: 30,
+                desc: "Classic Zambian lager (330ml)",
+                img: "https://picsum.photos/id/201/400/300"
+            }
+        ]
+        
+        let cart = []
+        
+        // Tailwind script already loaded
+        
+        function renderMenu(filteredItems) {
+            const grid = document.getElementById('menu-grid')
+            grid.innerHTML = ''
+            
+            filteredItems.forEach(item => {
+                const cardHTML = `
+                    <div class="menu-card bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden group">
+                        <div class="relative">
+                            <img src="${item.img}" class="w-full h-52 object-cover">
+                            <div class="absolute top-4 right-4 bg-black/70 px-3 py-1 rounded-2xl text-sm font-medium">
+                                K${item.price}
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-semibold text-xl">${item.name}</h3>
+                            <p class="text-zinc-400 text-sm mt-1 line-clamp-2">${item.desc}</p>
+                            <button onclick="addToCart(${item.id})" 
+                                    class="mt-6 w-full bg-sky-600 hover:bg-sky-500 transition py-4 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                ADD TO CART
+                            </button>
+                        </div>
+                    </div>
+                `
+                grid.innerHTML += cardHTML
+            })
+        }
+        
+        function filterCategory(btn) {
+            // Remove active from all
+            document.querySelectorAll('.category-btn').forEach(b => {
+                b.classList.remove('active', 'bg-white', 'text-zinc-900')
+                b.classList.add('bg-zinc-900', 'border-white/10')
+            })
+            
+            // Activate clicked
+            btn.classList.add('active', 'bg-white', 'text-zinc-900')
+            
+            const category = btn.dataset.category
+            
+            let filtered = menuItems
+            if (category !== 'all') {
+                filtered = menuItems.filter(item => item.category === category)
+            }
+            
+            renderMenu(filtered)
+        }
+        
+        function filterMenu() {
+            const term = document.getElementById('search-input').value.toLowerCase().trim()
+            
+            if (!term) {
+                renderMenu(menuItems)
+                return
+            }
+            
+            const filtered = menuItems.filter(item => 
+                item.name.toLowerCase().includes(term) || 
+                item.desc.toLowerCase().includes(term)
+            )
+            
+            renderMenu(filtered)
+        }
+        
+        function addToCart(id) {
+            const item = menuItems.find(i => i.id === id)
+            if (!item) return
+            
+            // Check if already in cart
+            const existing = cart.find(cartItem => cartItem.id === id)
+            
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1
+            } else {
+                cart.push({...item, quantity: 1})
+            }
+            
+            updateCartUI()
+            
+            // Toast
+            showToast(`${item.name} added to cart`)
+        }
+        
+        function updateCartUI() {
+            // Count
+            let count = 0
+            cart.forEach(item => count += (item.quantity || 1))
+            document.getElementById('cart-count').textContent = count
+            
+            // Total
+            let total = 0
+            cart.forEach(item => {
+                total += item.price * (item.quantity || 1)
+            })
+            document.getElementById('cart-total').textContent = `K${total}`
+            
+            // Render items
+            const container = document.getElementById('cart-items')
+            container.innerHTML = ''
+            
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center py-20 text-zinc-400">
+                        <i class="fa-solid fa-cart-shopping text-6xl mb-6 opacity-30"></i>
+                        <p>Your cart is empty</p>
+                    </div>
+                `
+                return
+            }
+            
+            cart.forEach((item, index) => {
+                const qty = item.quantity || 1
+                const html = `
+                    <div class="flex gap-4 bg-zinc-800 rounded-2xl p-4">
+                        <img src="${item.img}" class="w-20 h-20 object-cover rounded-xl">
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h4 class="font-medium">${item.name}</h4>
+                                    <p class="text-xs text-emerald-400">K${item.price} × ${qty}</p>
+                                </div>
+                                <div class="text-right font-semibold">K${item.price * qty}</div>
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <div class="flex items-center gap-3">
+                                    <button onclick="changeQuantity(${index}, -1)" class="w-8 h-8 flex items-center justify-center border border-white/30 rounded-xl hover:bg-white/10">-</button>
+                                    <span class="font-mono w-6 text-center">${qty}</span>
+                                    <button onclick="changeQuantity(${index}, 1)" class="w-8 h-8 flex items-center justify-center border border-white/30 rounded-xl hover:bg-white/10">+</button>
+                                </div>
+                                <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-500">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `
+                container.innerHTML += html
+            })
+        }
+        
+        function changeQuantity(index, delta) {
+            const item = cart[index]
+            if (!item) return
+            
+            item.quantity = (item.quantity || 1) + delta
+            
+            if (item.quantity < 1) {
+                cart.splice(index, 1)
+            }
+            
+            updateCartUI()
+        }
+        
+        function removeFromCart(index) {
+            cart.splice(index, 1)
+            updateCartUI()
+        }
+        
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer')
+            drawer.classList.toggle('open')
+        }
+        
+        function payAtTill() {
+            closePaymentModal()
+            toggleCart()
+            showToast("Thank you! Your order has been sent to the kitchen.", 4000)
+            
+            // Clear cart after delay
+            setTimeout(() => {
+                cart = []
+                updateCartUI()
+            }, 1800)
+        }
+        
+        function payWithCard() {
+            const modal = document.getElementById('payment-modal')
+            const content = document.getElementById('payment-content')
+            
+            modal.classList.remove('hidden')
+            content.innerHTML = `
+                <div class="space-y-8">
+                    <div class="flex items-center justify-center py-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-sky-400 to-blue-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                            💳
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-2xl font-medium">K${cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)}</p>
+                        <p class="text-zinc-400">Total amount</p>
+                    </div>
+                    
+                    <div class="bg-zinc-800 rounded-2xl p-6">
+                        <div class="flex justify-between items-center py-3 border-b border-white/10">
+                            <span class="text-zinc-400">Card number</span>
+                            <span class="font-mono">•••• •••• •••• 4242</span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 border-b border-white/10">
+                            <span class="text-zinc-400">Expiry</span>
+                            <span>12/28</span>
+                        </div>
+                        <div class="flex justify-between items-center py-3">
+                            <span class="text-zinc-400">Name</span>
+                            <span>John Mwamba</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="completeCardPayment()" 
+                            class="w-full py-6 bg-white text-zinc-900 rounded-3xl text-xl font-semibold flex items-center justify-center gap-3">
+                        <span>CONFIRM PAYMENT</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            `
+        }
+        
+        function completeCardPayment() {
+            const content = document.getElementById('payment-content')
+            content.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fa-solid fa-circle-check text-7xl text-emerald-400 mb-6"></i>
+                    <h3 class="text-2xl font-semibold">Payment Successful!</h3>
+                    <p class="text-zinc-400 mt-3">Your order has been placed.<br>Enjoy your meal!</p>
+                </div>
+            `
+            
+            setTimeout(() => {
+                closePaymentModal()
+                toggleCart()
+                cart = []
+                updateCartUI()
+                showToast("Thank you for dining with us! 🎉", 5000)
+            }, 2100)
+        }
+        
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.add('hidden')
+        }
+        
+        function showToast(message, timeout = 2200) {
+            const toast = document.createElement('div')
+            toast.style.cssText = `
+                position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+                background: #0ea5e9; color: white; padding: 16px 28px; border-radius: 9999px;
+                box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3); z-index: 9999;
+                font-weight: 500; display: flex; align-items: center; gap: 12px;
+            `
+            toast.innerHTML = `
+                ${message}
+            `
+            document.body.appendChild(toast)
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 1, 1)'
+                toast.style.opacity = '0'
+                toast.style.transform = 'translate(-50%, 20px)'
+                setTimeout(() => toast.remove(), 400)
+            }, timeout)
+        }
+        
+        function startScanning() {
+            // Simulate scan
+            showToast("QR Code scanned successfully! 🎉", 1500)
+            
+            setTimeout(() => {
+                document.getElementById('scan-screen').classList.add('hidden')
+                document.getElementById('main-app').classList.remove('hidden')
+                renderMenu(menuItems)
+            }, 800)
+        }
+        
+        function skipScan() {
+            document.getElementById('scan-screen').classList.add('hidden')
+            document.getElementById('main-app').classList.remove('hidden')
+            renderMenu(menuItems)
+        }
+        
+        function navigateTo(section) {
+            // For demo - could scroll or filter
+            showToast(`Navigating to ${section}...`, 1200)
+            // Could implement smooth scroll in full version
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "/" && document.getElementById('search-input')) {
+                e.preventDefault()
+                document.getElementById('search-input').focus()
+            }
+        })
+        
+        // Initialize
+        window.onload = function() {
+            // Render initial menu when main loads
+            console.log('%cSpillway Car Wash & Grill Web App ready 🍖', 'color:#0ea5e9; font-family:monospace')
+        }
+    </script>
+</body>
+</html>
